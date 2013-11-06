@@ -41,17 +41,21 @@ class Config:
 下载单个日志文件
 '''
 def urlDownload(conf):
-    start = time.time()
-    print conf.domain + ' ' + conf.ip + ' ' + conf.logName + ' download start...'
-    req = urllib2.Request(conf.getUrl())
-    req.add_header('Host', conf.domain)
-    req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:24.0) Gecko/20100101 Firefox/24.0')
-    if not os.path.exists(conf.getPath()):
-        os.makedirs(conf.getPath())
-    r = urllib2.urlopen(req)
-    with open(conf.getFilePath(), 'w') as f:
-        f.write(r.read())
-    print conf.domain + ' ' + conf.ip + ' ' + conf.logName + ' download success cost: ' + str(int(1000 * (time.time() - start))) + ' ms'
+    try:
+        start = time.time()
+        print conf.domain + ' ' + conf.ip + ' ' + conf.logName + ' download start...'
+        req = urllib2.Request(conf.getUrl())
+        req.add_header('Host', conf.domain)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:24.0) Gecko/20100101 Firefox/24.0')
+        if not os.path.exists(conf.getPath()):
+            os.makedirs(conf.getPath())
+        r = urllib2.urlopen(req)
+        with open(conf.getFilePath(), 'w') as f:
+            f.write(r.read())
+        print conf.domain + ' ' + conf.ip + ' ' + conf.logName + ' download success cost: ' + str(int(1000 * (time.time() - start))) + ' ms'
+    except Exception, e:
+        print 'request error'
+
 
 '''
 使用帮助
