@@ -21,12 +21,13 @@ import urllib2
 配置类每个实例对应一个下载文件
 '''
 class Config:
-    def __init__(self, ip, domain, logName, concat='/logs/', outPath=os.getcwd()):
+    def __init__(self, ip, domain, logName, concat='/logs/', outPath=os.getcwd(), debug=False):
         self.ip = ip
         self.domain = domain
         self.logName = logName
         self.concat = concat
         self.outPath = outPath
+        self.debug = debug
 
     def getUrl(self):
         return 'http://' + self.ip + self.concat + self.logName
@@ -50,11 +51,19 @@ def urlDownload(conf):
         if not os.path.exists(conf.getPath()):
             os.makedirs(conf.getPath())
         r = urllib2.urlopen(req)
+
         with open(conf.getFilePath(), 'w') as f:
-            f.write(r.read())
+            while True:
+                lines = r.readlines(100000)
+                if not lines:
+                    break
+                f.writelines(lines)
         print conf.domain + ' ' + conf.ip + ' ' + conf.logName + ' download success cost: ' + str(int(1000 * (time.time() - start))) + ' ms'
     except Exception, e:
-        print 'request error'
+        if conf.debug:
+            raise e
+        else :
+            print 'request error'
 
 
 '''
