@@ -1,0 +1,9 @@
+(public\s+void\s+set\w+\(\s*Date\s+\w+\)\s+{\s+this.(\w+)\s+=\s+\w+;\s+})
+###
+    public void setTemplate(Date template) {
+        if (template == null) {
+            this.template = null;
+        } else {
+            this.template = (Date) template.clone();
+        }
+    }
