@@ -3,7 +3,31 @@ __author__ = 'bjshijianwei'
 
 import re
 import os
+import sys
 
+'''
+模板：每个templates下的文件对应一个模版，
+模板中定义的正则会匹配到需要修改的字符串
+并根据替换规则替换
+模版文件示例：
+    (public\s+void\s+set(\w+)\(\s*Date\s+(?P<name>\w+)\)\s+{\s+this.(?P=name)\s+=\s+(?P=name);\s+})
+    ###
+        public void setTemplate(Date template) {
+            if (template == null) {
+                this.template = null;
+            } else {
+                this.template = (Date) template.clone();
+            }
+        }
+第一行为正则，从此正则中应能提取出三组数据：
+1. 完整的function
+2. get or set后的方法名
+3. 私有属性名
+2和3只有在忽略大小写的情况下相等脚本才会处理
+第二行为分隔符，务必是3个#，即：###
+第三行到文件末尾为需要被替换后的代码，
+私有属性名务必为template
+'''
 class Template:
     def __init__(self, regex, template):
         self.regex = regex
@@ -27,6 +51,9 @@ class Template:
                 text = text.replace(func, temp)
         return text
 
+'''
+用于读取templates目录下的模版配置文件
+'''
 class Config:
     def __init__(self):
         self.list = []
@@ -42,6 +69,11 @@ class Config:
     def getList(self):
         return self.list
 
+'''
+文件处理方法
+会根据传入的路径递归寻找路径下所有的java文件，
+并根据传入的模版匹配并修改文件
+'''
 def handleFile(filePath, templates):
     if filePath.find('.svn') > 0:
         return
@@ -63,7 +95,20 @@ def handleFile(filePath, templates):
                     f.write(text)
                     print 'success', filePath
 
+'''
+使用帮助
+'''
+def usage():
+    print 'Usage: SonarGetSetBugFix.py [filePath]'
+    print 'replace all get or set bugs that findbugs finded which is defined in templates folder'
+    print 'Demo: ./SonarGetSetBugFix.py D:\\workspace\\trunk\\project-trunk\\project-domain\\'
+
 if __name__ == '__main__':
+    print sys.argv
+    if len(sys.argv) < 2 or len(sys.argv) > 2:
+        usage()
+        sys.exit(1)
+    filePath = sys.argv[1]
     config = Config()
     templates = [Template(k,v) for k,v in config.list]
-    handleFile('D:\\workspace\\trunk\\pop-admin-order-trunk\\pop-order-common-domain\\src\\main\\java\\com\\jd\\pop\\domain\\promotion', templates)
+    handleFile(filePath, templates)
