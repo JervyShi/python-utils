@@ -1,0 +1,9 @@
+(public\s+void\s+set(\w+)\(\s*Timestamp\s+(?P<name>\w+)\)\s+{\s+this.(?P=name)\s+=\s+(?P=name);\s+})
+###
+    public void setTemplate(Timestamp template) {
+        if (template == null) {
+            this.template = null;
+        } else {
+            this.template = (Timestamp) template.clone();
+        }
+    }

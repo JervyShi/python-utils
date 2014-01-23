@@ -1,0 +1,8 @@
+(public\s+Timestamp\s+get(\w+)\(\)\s+{\s+return\s+(\w+);\s+})
+###
+		public Timestamp getTemplate() {
+        if (template == null) {
+            return null;
+        }
+        return (Timestamp) template.clone();
+    }

@@ -1,4 +1,4 @@
-(public\s+void\s+set\w+\(\s*Date\s+\w+\)\s+{\s+this.(\w+)\s+=\s+\w+;\s+})
+(public\s+void\s+set(\w+)\(\s*Date\s+(?P<name>\w+)\)\s+{\s+this.(?P=name)\s+=\s+(?P=name);\s+})
 ###
     public void setTemplate(Date template) {
         if (template == null) {
