@@ -1,4 +1,4 @@
-(public\s+String\[\]\s+get(\w+)\(\)\s+{\s+return\s+(\w+);\s+})
+(public\s+String\[\]\s+get(\w+)\(\)\s+{\s+return\s+(?:this.)?(\w+);\s+})
 ###
 		public String[] getTemplate() {
         if (template == null) {
