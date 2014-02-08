@@ -1,0 +1,10 @@
+(public\s+String\[\]\s+ice_(\w+)\(Ice\.Current __current\)\s+{\s+return\s+__(\w+);\s+})
+###
+    public String[]
+    ice_template(Ice.Current __current)
+    {
+        if (__template == null) {
+            return null;
+        }
+        return __template.clone();
+    }

@@ -1,0 +1,10 @@
+(public\s+String\[\]\s+ice_(\w+)\(\)\s+{\s+return\s+__(\w+);\s+})
+###
+    public String[]
+    ice_template()
+    {
+        if (__template == null) {
+            return null;
+        }
+        return __template.clone();
+    }
