@@ -12,6 +12,7 @@ filename:logDownload.py
 链接中间串:'concat:/logs/' (此串用于拼装完整链接，为空使用默认值)
 日志文件输出路径：'outPath:' (为空则使用当前路径)
 '''
+import ConfigParser
 import os
 import sys
 import time
@@ -54,10 +55,11 @@ def urlDownload(conf):
 
         with open(conf.getFilePath(), 'w') as f:
             while True:
-                lines = r.readlines(100000)
+                lines = r.readlines(50000)
                 if not lines:
                     break
                 f.writelines(lines)
+                f.flush()
         print conf.domain + ' ' + conf.ip + ' ' + conf.logName + ' download success cost: ' + str(int(1000 * (time.time() - start))) + ' ms'
     except Exception, e:
         if conf.debug:
@@ -95,17 +97,13 @@ if __name__ == '__main__':
         argvs = [sys.argv[1], sys.argv[2]]
         if argvs[0] == '-c' or argvs[0] == '--config':
             cfg = argvs[1]
-    with open(cfg, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if not line.startswith('#'):
-                k, v = line.split(':')
-                dict[k] = v
-    ipList = dict.get('ipList').split(',')
-    domain = dict.get('domain')
-    logNameList = dict.get('logNameList').split(',')
-    concat = dict.get('concat')
-    outPath = dict.get('outPathList')
+    config = ConfigParser.RawConfigParser()
+    config.read(cfg)
+    domain = config.get('base', 'domain')
+    concat = config.get('base', 'concat')
+    outPath = config.get('base', 'outPath')
+    ipList = config.get('base', 'ipList').split(',')
+    logNameList = config.get('base', 'logNameList').split(',')
     if not outPath:
         outPath = os.getcwd()
     conf = Config('', domain, '', concat, outPath)
