@@ -12,6 +12,7 @@ filename:logDownload.py
 链接中间串:'concat:/logs/' (此串用于拼装完整链接，为空使用默认值)
 日志文件输出路径：'outPath:' (为空则使用当前路径)
 '''
+import argparse
 import ConfigParser
 import os
 import sys
@@ -80,23 +81,11 @@ def usage():
     print 'Demo: ./logDownload.py -c config.cfg'
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Download log files from different hosts with same domain')
+    parser.add_argument('-c', help='set configuration file', default='config.cfg')
+    args = parser.parse_args()
+    cfg = args.c
     start = time.time()
-    dict = {}
-    cfg = 'config.cfg'
-    if len(sys.argv) > 3:
-        usage()
-        sys.exit(1)
-    if len(sys.argv) == 2:
-        argv = sys.argv[1]
-        if argv == '-h' or argv == '--help':
-            usage()
-            sys.exit(1)
-        if argv == '-c' or argv == '--config':
-            cfg = 'config.cfg'
-    if len(sys.argv) == 3:
-        argvs = [sys.argv[1], sys.argv[2]]
-        if argvs[0] == '-c' or argvs[0] == '--config':
-            cfg = argvs[1]
     config = ConfigParser.RawConfigParser()
     config.read(cfg)
     domain = config.get('base', 'domain')
