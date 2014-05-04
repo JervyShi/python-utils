@@ -4,77 +4,76 @@ __author__ = 'bjshijianwei'
 import re
 import os
 
-import config
-from util.dateUtil import DateUtil
+import scm.config as Config
+from scm.util.dateUtil import DateUtil
 
 
 class JobInfo(object):
     REGEX = r'http\:\/\/(?P<svnKind>\w+\d?)\.360buy-develop\.com/(?P<svnLib>\w+)/(?P<svnDirect>.+)'
-    EXCLUDEA_R = 'excludeA+R'
-    INCLUDEA_R = 'includeA+R'
+    EXCLUDE_A_R = 'excludeA+R'
+    INCLUDE_A_R = 'includeA+R'
 
-    def __init__(self, svnUrl):
-        self.svnUrl = svnUrl
+    def __init__(self, svn_url):
+        self.svn_url = svn_url
         p = re.compile(JobInfo.REGEX, re.M)
-        m = re.search(p, svnUrl)
-        self.svnKind = 'svn1' if m.group('svnKind') == 'svn1' else 'svn'
-        self.svnLib = m.group('svnLib')
-        self.svnDirect = m.group('svnDirect')
-        self.logName = 'logfile_%s.log' % self.svnDirect
-        self.logRewriteName = 'logfile_%s.rewrite.log' % self.svnDirect
-        self.logDeleteName = 'logfile_%s.delete.log' % self.svnDirect
+        m = re.search(p, svn_url)
+        self.svn_kind = 'svn1' if m.group('svnKind') == 'svn1' else 'svn'
+        self.svn_lib = m.group('svnLib')
+        self.svn_direct = m.group('svnDirect')
+        self.log_name = 'logfile_%s.log' % self.svn_direct
+        self.log_rewrite_name = 'logfile_%s.rewrite.log' % self.svn_direct
+        self.log_delete_name = 'logfile_%s.delete.log' % self.svn_direct
 
-    def getDirectPath(self):
+    def get_direct_path(self):
         """directPath
         demo: C:\resource\2014\svn1\cdrd_jos\17
         """
-        return config.DIRECTORY_PREFIX + os.sep + str(DateUtil.getYear()) + os.sep \
-               + self.svnKind + os.sep + self.svnLib + '_' + self.svnDirect \
-               + os.sep + str(DateUtil.getWeekOfYear())
+        return """%s%s%s%s%s%s%s_%s%s%s""" % (Config.DIRECTORY_PREFIX, os.sep, str(DateUtil.getYear()), os.sep,
+               self.svn_kind, os.sep, self.svn_lib, self.svn_direct,
+               os.sep, str(DateUtil.getWeekOfYear()))
 
-    def getCheckOutPath(self):
+    def get_check_out_path(self):
         """checkOutPath
         demo: C:\resource\2014\svn1\cdrd_jos\17\checkout
         """
-        return self.getDirectPath() + os.sep + 'checkout'
+        return self.get_direct_path() + os.sep + 'checkout'
 
-    def getSvnLogPath(self):
-        return self.getCheckOutPath() + os.sep + self.logName
+    def get_svn_log_path(self):
+        return self.get_check_out_path() + os.sep + self.log_name
 
-    def getSvnRewriteLogPath(self):
-        return self.getCheckOutPath() + os.sep + self.logRewriteName
+    def get_svn_rewrite_log_path(self):
+        return self.get_check_out_path() + os.sep + self.log_rewrite_name
 
-    def getSvnDeleteLogPath(self):
-        return self.getCheckOutPath() + os.sep + self.logDeleteName
+    def get_svn_delete_log_path(self):
+        return self.get_check_out_path() + os.sep + self.log_delete_name
 
-    def getSvnCheckOutCommand(self):
-        #return ['svn', 'checkout', '--depth', 'immediates', str(self.svnUrl), str(self.getCheckOutPath())]
-        return 'svn checkout --depth immediates %s %s' % (self.svnUrl, self.getCheckOutPath())
+    def get_svn_check_out_command(self):
+        return 'svn checkout --depth immediates %s %s' % (self.svn_url, self.get_check_out_path())
 
-    def getSvnLogCommand(self):
+    def get_svn_log_command(self):
         """svn log command
         demo: svn log -r {2014-4-21}:{2014-4-27} -v --xml>logfile_jos.log
         """
-        return 'cd %s && svn log -r {%s}:{%s} -v --xml>logfile_%s.log' % (self.getCheckOutPath(),
-            DateUtil.getMondayOfLastWeek(), DateUtil.getSundayOfLastWeek(), self.svnDirect)
+        return 'cd %s && svn log -r {%s}:{%s} -v --xml>logfile_%s.log' % (
+            self.get_check_out_path(), DateUtil.getMondayOfLastWeek(), DateUtil.getSundayOfLastWeek(), self.svn_direct)
 
-    def getRewriteCommand(self):
+    def get_rewrite_command(self):
         return 'java -jar %s %s %s -charset gb2312 -output-dir %s' % (
-            config.STATSVN_PATH, self.getSvnRewriteLogPath(), self.getCheckOutPath(),
-            self.getDirectPath() + os.sep + JobInfo.EXCLUDEA_R)
+            Config.STATSVN_PATH, self.get_svn_rewrite_log_path(), self.get_check_out_path(),
+            self.get_direct_path() + os.sep + JobInfo.EXCLUDE_A_R)
 
-    def getDeleteCommand(self):
+    def get_delete_command(self):
         return 'java -jar %s %s %s -charset gb2312 -output-dir %s' % (
-            config.STATSVN_PATH, self.getSvnDeleteLogPath(), self.getCheckOutPath(),
-            self.getDirectPath() + os.sep + JobInfo.INCLUDEA_R)
+            Config.STATSVN_PATH, self.get_svn_delete_log_path(), self.get_check_out_path(),
+            self.get_direct_path() + os.sep + JobInfo.INCLUDE_A_R)
 
 
 if __name__ == '__main__':
     job = JobInfo('http://svn1.360buy-develop.com/cdrd/jos')
-    print job.getDirectPath()
-    print job.getCheckOutPath()
-    print job.getSvnCheckOutCommand()
-    print job.getSvnLogCommand()
-    print job.getRewriteCommand()
-    print job.getDeleteCommand()
+    print job.get_direct_path()
+    print job.get_check_out_path()
+    print job.get_svn_check_out_command()
+    print job.get_svn_log_command()
+    print job.get_rewrite_command()
+    print job.get_delete_command()
 

@@ -3,7 +3,7 @@ __author__ = 'bjshijianwei'
 
 import unittest
 
-from model.userDirectLines import UserDirectLines, UserDirectLinesDel, AbsUserDirectLines
+from scm.model.userDirectLines import UserDirectLines, UserDirectLinesDel, AbsUserDirectLines
 
 
 class TestUserDirectLines(unittest.TestCase):
