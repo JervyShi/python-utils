@@ -52,7 +52,7 @@ class JobInfo(object):
 
     def get_svn_log_command(self):
         """svn log command
-        demo: svn log -r {2014-4-21}:{2014-4-27} -v --xml>logfile_jos.log
+        demo: svn log http://svn1.360buy-develop.com/cdrd/jos -r {2014-4-21}:{2014-4-27} -v --xml>C:\resource\2014\svn1\cdrd_jos\17\checkout\logfile_jos.log
         """
         return 'svn log %s -r {%s}:{%s} -v --xml>%s' % (
             self.svn_url, DateUtil.getMondayOfLastWeek(), DateUtil.getSundayOfLastWeek(),

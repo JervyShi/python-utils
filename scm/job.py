@@ -59,34 +59,37 @@ def store_user_direct_info(job, table_name):
                             print 'add error', table_name, line
 
 
+def main():
+
+    svn_url_list = SvnUrlInfo.get_all()
+    for svnUrl in svn_url_list:
+        job = JobInfo(svnUrl)
+        print job.svn_url + 'process start'
+
+        # checkout svn code
+        print 'step 1: svn checkout'
+        system_command(job.get_svn_check_out_command())
+
+        # check svn log
+        print 'step 2: svn log'
+        system_command(job.get_svn_log_command())
+
+        # rewrite log
+        print 'step 3: rewrite log'
+        logRewrite.rewriteLog(job.get_svn_log_path(), logRewrite.getAllNeedDeleteRevisions(job.get_svn_log_path()))
+
+        # statsvn rewrite
+        print 'step 4: statsvn analysis rewrite svn log'
+        system_command(job.get_rewrite_command())
+
+        # statsvn delete
+        print 'step 5: statsvn analysis delete svn log'
+        system_command(job.get_delete_command())
+
+        # analysis html and put them into database
+        print 'step 6: analysis html and put them into database'
+        store_user_direct_info(job, 'user_directory_linescode')
+        store_user_direct_info(job, 'user_directory_linescode_del')
+
 if __name__ == '__main__':
-
-    svnUrl = 'http://svn1.360buy-develop.com/pop/pop-order-work'
-    #svnUrl = 'https://svn.sinaapp.com/foodcmd'
-    job = JobInfo(svnUrl)
-    print job.svn_url + 'process start'
-
-    # checkout svn code
-    print 'step 1: svn checkout'
-    system_command(job.get_svn_check_out_command())
-
-    # check svn log
-    print 'step 2: svn log'
-    system_command(job.get_svn_log_command())
-
-    # rewrite log
-    print 'step 3: rewrite log'
-    logRewrite.rewriteLog(job.get_svn_log_path(), logRewrite.getAllNeedDeleteRevisions(job.get_svn_log_path()))
-
-    # statsvn rewrite
-    print 'step 4: statsvn analysis rewrite svn log'
-    # system_command(job.get_rewrite_command())
-
-    # statsvn delete
-    print 'step 5: statsvn analysis delete svn log'
-    # system_command(job.get_delete_command())
-
-    # analysis html and put them into database
-    print 'step 6: analysis html and put them into database'
-    store_user_direct_info(job, 'user_directory_linescode')
-    store_user_direct_info(job, 'user_directory_linescode_del')
+    main()
