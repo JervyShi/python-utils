@@ -12,7 +12,7 @@ from model.jobInfo import JobInfo
 from model.svnUrlInfo import SvnUrlInfo
 
 
-def systemCommand(command):
+def system_command(command):
     try:
         print command
         # pip = subprocess.check_output(command, shell=True)
@@ -24,22 +24,27 @@ def systemCommand(command):
     except subprocess.CalledProcessError:
         pass
 
+def store_user_direct_info(job):
+    if job is not None and isinstance(job, JobInfo):
+        svn_url_info = SvnUrlInfo.get_by_svn_url(job.svn_url)
+
+
 if __name__ == '__main__':
 
     svnUrl = 'http://svn1.360buy-develop.com/pop/pop-order-work'
     #svnUrl = 'https://svn.sinaapp.com/foodcmd'
     job = JobInfo(svnUrl)
     # checkout svn code
-    systemCommand(job.getSvnCheckOutCommand())
+    system_command(job.getSvnCheckOutCommand())
 
     # check svn log
-    systemCommand(job.getSvnLogCommand())
+    system_command(job.getSvnLogCommand())
 
     # rewrite log
     # logRewrite.rewriteLog(job.getSvnLogPath(), logRewrite.getAllNeedDeleteRevisions(job.getSvnLogPath()))
 
     # statsvn rewrite
-    # systemCommand(job.getRewriteCommand())
+    # system_command(job.getRewriteCommand())
 
     # statsvn delete
-    # systemCommand(job.getDeleteCommand())
+    # system_command(job.getDeleteCommand())
