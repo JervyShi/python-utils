@@ -3,6 +3,9 @@ __author__ = 'bjshijianwei'
 
 import subprocess
 import sys
+import os
+
+sys.path.append("../")
 
 import util.logRewrite as logRewrite
 from model.jobInfo import JobInfo
@@ -27,12 +30,10 @@ if __name__ == '__main__':
     #svnUrl = 'https://svn.sinaapp.com/foodcmd'
     job = JobInfo(svnUrl)
     # checkout svn code
-    #systemCommand(job.getSvnCheckOutCommand())
+    systemCommand(job.getSvnCheckOutCommand())
 
-    #systemCommand(['svn help'])
-    #systemCommand('set')
     # check svn log
-    # systemCommand(job.getSvnLogCommand())
+    systemCommand(job.getSvnLogCommand())
 
     # rewrite log
     # logRewrite.rewriteLog(job.getSvnLogPath(), logRewrite.getAllNeedDeleteRevisions(job.getSvnLogPath()))
