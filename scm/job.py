@@ -4,6 +4,9 @@ __author__ = 'bjshijianwei'
 import subprocess
 import sys
 import os
+import traceback
+import logging
+import logging.config
 
 sys.path.append("../")
 
@@ -13,18 +16,19 @@ from util.dateUtil import DateUtil
 from model.jobInfo import JobInfo
 from model.svnUrlInfo import SvnUrlInfo
 from model.svnUsers import SvnUsers
-from model.userDirectLines import AbsUserDirectLines, UserDirectLines, UserDirectLinesDel
+from model.userDirectLines import AbsUserDirectLines
+
+logging.config.fileConfig("logging.conf")
+logger = logging.getLogger("main")
 
 
 def system_command(command):
     try:
-        print command
-        # pip = subprocess.check_output(command, shell=True)
-        # print pip
+        logger.debug(command)
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, universal_newlines=True)
+                                   stderr=subprocess.PIPE, universal_newlines=True)
         out, err = process.communicate()
-        print out, err
+        logger.debug('out: %s error: %s' % (out, err))
     except subprocess.CalledProcessError:
         pass
 
@@ -52,44 +56,56 @@ def store_user_direct_info(job, table_name):
                         line.year = DateUtil.getYearOfLastWeek()
                         table_id = AbsUserDirectLines.add(line, table_name)
                         if table_id == 1:
-                            print 'already exists', table_name, line
+                            logger.debug('already exists %s %s' % (table_name, line))
                         elif table_id > 1:
-                            print 'add success', table_name, line
+                            logger.debug('add success %s %s' % (table_name, line))
                         else:
-                            print 'add error', table_name, line
+                            logger.debug('add error %s %s' % (table_name, line))
 
 
 def main():
 
+    logger.info('%s %s {%s} - {%s} job end' % (
+        DateUtil.getYearOfLastWeek(), DateUtil.getLastWeekOfYear(),
+        DateUtil.getMondayOfLastWeek(), DateUtil.getSundayOfLastWeek()))
     svn_url_list = SvnUrlInfo.get_all()
-    for svnUrl in svn_url_list:
-        job = JobInfo(svnUrl)
-        print job.svn_url + 'process start'
+    # svn_url_list = ['http://svn1.360buy-develop.com/pop/pop-order-work']
+    for svn_url in svn_url_list:
+        try:
+            job = JobInfo(svn_url)
+            logger.info('%s process start' % (job.svn_url,))
 
-        # checkout svn code
-        print 'step 1: svn checkout'
-        system_command(job.get_svn_check_out_command())
+            # checkout svn code
+            logger.info('step 1: svn checkout')
+            system_command(job.get_svn_check_out_command())
 
-        # check svn log
-        print 'step 2: svn log'
-        system_command(job.get_svn_log_command())
+            # check svn log
+            logger.info('step 2: svn log')
+            system_command(job.get_svn_log_command())
 
-        # rewrite log
-        print 'step 3: rewrite log'
-        logRewrite.rewriteLog(job.get_svn_log_path(), logRewrite.getAllNeedDeleteRevisions(job.get_svn_log_path()))
+            # rewrite log
+            logger.info('step 3: rewrite log')
+            logRewrite.rewriteLog(job.get_svn_log_path(), logRewrite.getAllNeedDeleteRevisions(job.get_svn_log_path()))
 
-        # statsvn rewrite
-        print 'step 4: statsvn analysis rewrite svn log'
-        system_command(job.get_rewrite_command())
+            # statsvn rewrite
+            logger.info('step 4: statsvn analysis rewrite svn log')
+            system_command(job.get_rewrite_command())
 
-        # statsvn delete
-        print 'step 5: statsvn analysis delete svn log'
-        system_command(job.get_delete_command())
+            # statsvn delete
+            logger.info('step 5: statsvn analysis delete svn log')
+            system_command(job.get_delete_command())
 
-        # analysis html and put them into database
-        print 'step 6: analysis html and put them into database'
-        store_user_direct_info(job, 'user_directory_linescode')
-        store_user_direct_info(job, 'user_directory_linescode_del')
+            # analysis html and put them into database
+            logger.info('step 6: analysis html and put them into database')
+            store_user_direct_info(job, 'user_directory_linescode')
+            store_user_direct_info(job, 'user_directory_linescode_del')
+            logger.info('%s process end' % svn_url)
+        except Exception:
+            logger.error('%s process error' % svn_url)
+            logger.error(traceback.format_exc())
+    logger.info('%s %s {%s} - {%s} job end' % (
+        DateUtil.getYearOfLastWeek(), DateUtil.getLastWeekOfYear(),
+        DateUtil.getMondayOfLastWeek(), DateUtil.getSundayOfLastWeek()))
 
 if __name__ == '__main__':
     main()

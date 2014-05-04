@@ -2,10 +2,12 @@
 __author__ = 'bjshijianwei'
 
 import datetime
-
 import MySQLdb
-
 import config
+import logging
+
+logger = logging.getLogger("main")
+
 
 def connect_db():
     try:
@@ -19,7 +21,7 @@ def connect_db():
             charset="utf8")
         return conn
     except Exception, e:
-        print "connect db fail:%s" % e
+        logger.error("connect db fail:%s" % e)
         return None
 
 class DB(object):
@@ -37,7 +39,7 @@ class DB(object):
             cursor = cursor or self._conn.cursor()
             cursor.execute(*a, **kw)
         except (AttributeError, MySQLdb.OperationalError):
-            print 'debug, %s re-connect to mysql' % datetime.datetime.now()
+            logger.debug('%s re-connect to mysql' % datetime.datetime.now())
             self._conn and self._conn.close()
             self.connect()
             cursor = self._conn.cursor()
