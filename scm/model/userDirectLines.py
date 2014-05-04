@@ -7,6 +7,15 @@ from MySQLdb import IntegrityError
 
 
 class AbsUserDirectLines(object):
+    def __repr__(self):
+        return """<id=%s, svn_user_id=%s, svn_url_info=%s, lines_of_code=%s, changes=%s,
+                lines_per_change=%s, directory=%s, start_date=%s, end_date=%s, week=%s, year=%s>""" % (
+            self.id, self.svn_user_id, self.svn_url_info_id, self.lines_of_code, self.changes,
+            self.lines_per_change, self.directory, self.start_date, self.end_date, self.week, self.year
+        )
+
+    __str__ = __repr__
+
     def __init__(self, id, svn_user_id=None, svn_url_info_id=None, lines_of_code=None,
                  changes=None, lines_per_change=None, directory=None, start_date=None,
                  end_date=None, week=None, year=None):

@@ -20,6 +20,10 @@ class DateUtil(object):
         return (date.today() + timedelta(weeks=-1)).isocalendar()[1]
 
     @classmethod
+    def getYearOfLastWeek(cls):
+        return (date.today() + timedelta(weeks=-1)).year
+
+    @classmethod
     def getMondayOfLastWeek(cls):
         day = date.today()
         return day - timedelta(days=day.weekday()) + timedelta(days=0, weeks=-1)
@@ -35,3 +39,4 @@ if __name__ == '__main__':
     print DateUtil.getMondayOfLastWeek()
     print DateUtil.getSundayOfLastWeek()
     print DateUtil.getLastWeekOfYear()
+    print DateUtil.getYearOfLastWeek()

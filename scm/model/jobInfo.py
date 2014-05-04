@@ -30,7 +30,7 @@ class JobInfo(object):
         """
         return """%s%s%s%s%s%s%s_%s%s%s""" % (Config.DIRECTORY_PREFIX, os.sep, str(DateUtil.getYear()), os.sep,
                self.svn_kind, os.sep, self.svn_lib, self.svn_direct,
-               os.sep, str(DateUtil.getWeekOfYear()))
+               os.sep, str(DateUtil.getLastWeekOfYear()))
 
     def get_check_out_path(self):
         """checkOutPath
@@ -54,19 +54,25 @@ class JobInfo(object):
         """svn log command
         demo: svn log -r {2014-4-21}:{2014-4-27} -v --xml>logfile_jos.log
         """
-        return 'cd %s && svn log -r {%s}:{%s} -v --xml>logfile_%s.log' % (
-            self.get_check_out_path(), DateUtil.getMondayOfLastWeek(), DateUtil.getSundayOfLastWeek(), self.svn_direct)
+        return 'svn log %s -r {%s}:{%s} -v --xml>%s' % (
+            self.svn_url, DateUtil.getMondayOfLastWeek(), DateUtil.getSundayOfLastWeek(),
+            self.get_svn_log_path())
 
     def get_rewrite_command(self):
         return 'java -jar %s %s %s -charset gb2312 -output-dir %s' % (
             Config.STATSVN_PATH, self.get_svn_rewrite_log_path(), self.get_check_out_path(),
-            self.get_direct_path() + os.sep + JobInfo.EXCLUDE_A_R)
+            self.get_rewrite_direct())
 
     def get_delete_command(self):
         return 'java -jar %s %s %s -charset gb2312 -output-dir %s' % (
             Config.STATSVN_PATH, self.get_svn_delete_log_path(), self.get_check_out_path(),
-            self.get_direct_path() + os.sep + JobInfo.INCLUDE_A_R)
+            self.get_delete_direct())
 
+    def get_rewrite_direct(self):
+        return '%s%s%s' % (self.get_direct_path(), os.sep, JobInfo.EXCLUDE_A_R)
+
+    def get_delete_direct(self):
+        return '%s%s%s' % (self.get_direct_path(), os.sep, JobInfo.INCLUDE_A_R)
 
 if __name__ == '__main__':
     job = JobInfo('http://svn1.360buy-develop.com/cdrd/jos')
